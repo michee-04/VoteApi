@@ -10,4 +10,12 @@ func RegisterUser(route *chi.Mux){
 
 	route.HandleFunc("/auth/register", controller.CreateUser)
 
+	route.HandleFunc("/auth/verify", controller.VerifyHandler)
+
+	route.HandleFunc("/auth/login", controller.LoginHandler)
+
+
+
+	// route.Post("/auth/register", controller.CreateUser)
+
 }
