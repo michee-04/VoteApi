@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"path/filepath"
 	"text/template"
@@ -11,9 +12,7 @@ import (
 	"github.com/michee/micgram/pkg/utils/email"
 )
 
-
-
-func CreateUser(w http.ResponseWriter, r *http.Request){
+func CreateUser(w http.ResponseWriter, r *http.Request) {
 	u := &model.User{}
 	utils.ParseBody(r, u)
 	user := u.CreateUser()
@@ -23,7 +22,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request){
 	w.Write(res)
 	email.SendVerificationEmail(user)
 	w.Write([]byte("Please check your email to verify your account."))
-
 }
 
 func VerifyHandler(w http.ResponseWriter, r *http.Request) {
@@ -45,24 +43,24 @@ func VerifyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Serve the index.html file
-	templatePath := filepath.Join("pkg", "utils", "email", "index.html")
-	tmpl, err := template.ParseFiles(templatePath)
+	// Utilisez un chemin absolu pour charger le fichier template
+	absPath, err := filepath.Abs("templates/index.tmpl")
+
 	if err != nil {
+		log.Printf("Error getting absolute path: %v", err)
 		http.Error(w, "Unable to load template", http.StatusInternalServerError)
 		return
 	}
-	res, _ := json.Marshal(user)
-	w.Header().Set("content-type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	// w.WriteHeader(http.StatusOK)
+	tmpl, err := template.ParseFiles(absPath)
+	if err != nil {
+		log.Printf("Error loading template: %v", err)
+		http.Error(w, "Unable to load template", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("content-type", "text/html")
+	w.WriteHeader(http.StatusOK)
 	tmpl.Execute(w, nil)
-	w.Write(res)
-
 }
-
-
-
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	var creds struct {
@@ -92,6 +90,9 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Login successful, handle session creation, etc.
+	res, _ := json.Marshal(user)
+	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	w.Write(res)
 	w.Write([]byte(`{"message": "Login successful"}`))
 }

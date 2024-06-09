@@ -5,17 +5,23 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
-	"github.com/michee/micgram/pkg/routes"
+	"github.com/go-chi/chi/middleware"
+	"github.com/michee/micgram/pkg/controller"
 )
 
 const port = ":3000"
 
 func main (){
 	r := chi.NewRouter()
+	
+	// http.Handle("/", r)
+	r.Use(middleware.Logger)
 
-	routes.RegisterUser(r)
+	r.Post("/auth/register", controller.CreateUser)
 
-	http.Handle("/", r)
+	r.Get("/auth/verify", controller.VerifyHandler)
+	r.Post("/auth/login", controller.LoginHandler)
+
 
 	fmt.Printf("le serveur fonctionne sur http://localhost%s", port)
 

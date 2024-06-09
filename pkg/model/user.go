@@ -23,7 +23,6 @@ type User struct {
 	VerificationToken  string `json:"verificationToken"`
 }
 
-
 func (user *User) BeforeCreate(scope *gorm.DB) error {
 	user.UserId = uuid.New().String()
 	return nil
