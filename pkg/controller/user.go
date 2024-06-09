@@ -2,9 +2,9 @@ package controller
 
 import (
 	"encoding/json"
-	"log"
+	// "log"
 	"net/http"
-	"path/filepath"
+	// "path/filepath"
 	"text/template"
 
 	"github.com/michee/micgram/pkg/model"
@@ -44,19 +44,21 @@ func VerifyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Utilisez un chemin absolu pour charger le fichier template
-	absPath, err := filepath.Abs("templates/index.tmpl")
+	// absPath, err := filepath.Abs("templates/index.tmpl")
 
-	if err != nil {
-		log.Printf("Error getting absolute path: %v", err)
-		http.Error(w, "Unable to load template", http.StatusInternalServerError)
-		return
-	}
-	tmpl, err := template.ParseFiles(absPath)
-	if err != nil {
-		log.Printf("Error loading template: %v", err)
-		http.Error(w, "Unable to load template", http.StatusInternalServerError)
-		return
-	}
+	// if err != nil {
+	// 	log.Printf("Error getting absolute path: %v", err)
+	// 	http.Error(w, "Unable to load template", http.StatusInternalServerError)
+	// 	return
+	// }
+
+	tmpl := template.Must(template.ParseFiles("C:/Go/VoteApi/templates/index.tmpl"))
+	
+	// if err != nil {
+	// 	log.Printf("Error loading template: %v", err)
+	// 	http.Error(w, "Unable to load template", http.StatusInternalServerError)
+	// 	return
+	// }
 	w.Header().Set("content-type", "text/html")
 	w.WriteHeader(http.StatusOK)
 	tmpl.Execute(w, nil)

@@ -13,7 +13,7 @@ var (
 )
 
 func ConnectDB() {
-	dsn := "root:@tcp(127.0.0.1:3306)/micgram?charset=utf8&parseTime=True&loc=Local"
+	dsn := "root:@tcp(127.0.0.1:3306)/vote?charset=utf8&parseTime=True&loc=Local"
 
 	connect, err := gorm.Open("mysql", dsn)
 
