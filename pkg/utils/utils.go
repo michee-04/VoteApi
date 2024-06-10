@@ -16,7 +16,7 @@ func HashPassword(password string) (string, error){
 	if err != nil{
 		return "", err
 	}
-
+	
 	return string(hashedPassword), nil
 }
 
@@ -34,7 +34,6 @@ func BeforeCreateIdHexa(scope *gorm.DB, champ string){
 	id := uuid.New().String()
 	scope.Statement.SetColumn(champ, id)
 }
-
 
 // CheckPasswordHash compare le mot de passe et le hash.
 func CheckPasswordHash(password, hash string) bool {
