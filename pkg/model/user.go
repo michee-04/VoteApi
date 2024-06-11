@@ -15,7 +15,7 @@ import (
 var DB *gorm.DB
 
 type User struct {
-	UserId             string `gorm:"primary_key"`
+	UserId             string `gorm:"primary_key;column:userid"`
 	Name               string `json:"name"`
 	Username           string `json:"username"`
 	Email              string `gorm:"unique"`
@@ -76,13 +76,13 @@ func GetAllUser() []User {
 
 func GetUserById(Id string) (*User, *gorm.DB) {
 	var GetUser User
-	db := DB.Where("UserId=?", Id).Find(&GetUser)
+	db := DB.Where("userId=?", Id).Find(&GetUser)
 	return &GetUser, db
 }
 
 func DeleteUserId(Id string) User {
 	var user User
-	DB.Where("UserId=?", Id).Delete(user)
+	DB.Where("userId=?", Id).Delete(user)
 	return user
 }
 
@@ -110,5 +110,7 @@ func (u *User) UpdatePassword(newPassword string) error {
 	u.Password = hashedPassword
 	u.ResetToken = ""
 	u.ResetTokenExpiry = time.Time{}
-	return DB.Save(u).Error
-}
+	
+	fmt.Println("New hashed password:", hashedPassword)
+    
+	return DB.Save(u).Error}

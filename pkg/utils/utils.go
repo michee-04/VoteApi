@@ -35,7 +35,7 @@ func BeforeCreateIdHexa(scope *gorm.DB, champ string){
 	scope.Statement.SetColumn(champ, id)
 }
 
-// CheckPasswordHash compare le mot de passe et le hash.
+// CheckPasswordHash compares the plain password with the hashed password.
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
