@@ -17,16 +17,42 @@ func main (){
 	r.Use(middleware.Logger)
 	r.Use(middleware.RequestID)
 
+	// Authentification
+	r.Route("/auth", func(r chi.Router) {
+		r.Post("/register", controller.CreateUser)
+		r.Get("/verify", controller.VerifyHandler)
+		r.Post("/login", controller.LoginHandler)
+		// r.Post("/forgot-password", controller.ForgotPasswordHandler)
+		// r.Get("/reset-password-email", controller.ResetPasswordEmail)
+		// r.Post("/reset-password", controller.ResetPasswordHandler)
+	})
+
+
+
 	// User
-	r.Post("/auth/register", controller.CreateUser)
-	r.Get("/auth/verify", controller.VerifyHandler)
-	r.Post("/auth/login", controller.LoginHandler)
-	r.Get("/user", controller.GetUser)
-	// r.Post("/auth/forgot-password", controller.ForgotPasswordHandler)
-	// r.Get("/auth/reset-password-email", controller.ResetPasswordEmail)
-	// r.Post("/auth/reset-password", controller.ResetPasswordHandler)
-	r.Patch("/user/{userId}", controller.UpdateUser)
-	r.Delete("/user/{userId}", controller.DeleteUser)
+	r.Route("/user", func(r chi.Router) {
+		r.Get("/", controller.GetUser)
+
+		
+		r.Route("/{userId}", func(r chi.Router) {
+			r.Get("/", controller.GetUserById)
+			r.Patch("/", controller.UpdateUser)
+			r.Delete("/", controller.DeleteUser)
+		})
+			
+	})
+
+	// Election
+	r.Route("/election", func(r chi.Router) {
+		r.Post("/createElection", controller.CreateElection)
+		r.Get("/", controller.GetElection)
+
+		r.Route("/{electionId}", func(r chi.Router) {
+			r.Get("/", controller.GetElectionById)
+			r.Delete("/", controller.DeleteElection)
+		})
+	})
+
 
 
 	fmt.Printf("le serveur fonctionne sur http://localhost%s", port)

@@ -15,15 +15,17 @@ import (
 var DB *gorm.DB
 
 type User struct {
-	UserId             string `gorm:"primary_key;column:userid"`
+	UserId             string `gorm:"primary_key;column:userId"`
 	Name               string `json:"name"`
 	Username           string `json:"username"`
 	Email              string `gorm:"unique"`
 	Password           string `gorm:"password"`
 	EmailVerified      bool
+	Role 							 bool
 	VerificationToken  string `json:"verificationToken"`
 	ResetToken         string `json:"resetToken"`
 	ResetTokenExpiry   time.Time `json:"resetTokenExpiry"`
+	Vote []Vote `gorm:"foreignKey:UserId"`
 }
 
 func (user *User) BeforeCreate(scope *gorm.DB) error {
@@ -34,7 +36,7 @@ func (user *User) BeforeCreate(scope *gorm.DB) error {
 func init() {
 	database.ConnectDB()
 	DB = database.GetDB()
-	DB.DropTableIfExists(&User{})
+	// DB.DropTableIfExists(&User{})
 	DB.AutoMigrate(&User{})
 }
 
@@ -70,19 +72,20 @@ func (u *User) CanLogin() bool {
 
 func GetAllUser() []User {
 	var Users []User
+	// DB.Preload("Vote").Find(&Users)
 	DB.Find(&Users)
 	return Users
 }
 
 func GetUserById(Id string) (*User, *gorm.DB) {
-	var GetUser User
-	db := DB.Where("userId=?", Id).Find(&GetUser)
-	return &GetUser, db
+	var getUser User
+	db := DB.Where("userId=?", Id).Find(&getUser)
+	return &getUser, db
 }
 
 func DeleteUserId(Id string) User {
 	var user User
-	DB.Where("userId=?", Id).Delete(user)
+	DB.Where("userId=?", Id).Delete(&user)
 	return user
 }
 
@@ -110,7 +113,7 @@ func (u *User) UpdatePassword(newPassword string) error {
 	u.Password = hashedPassword
 	u.ResetToken = ""
 	u.ResetTokenExpiry = time.Time{}
-	
 	fmt.Println("New hashed password:", hashedPassword)
     
-	return DB.Save(u).Error}
+	return DB.Save(u).Error
+}

@@ -111,6 +111,20 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	w.Write(res)
 }
 
+
+func GetUserById(w http.ResponseWriter, r *http.Request) {
+	userId := chi.URLParam(r, "userId")
+	user, _ := model.GetUserById(userId)
+
+
+	res, _ := json.Marshal(user)
+	w.Header().Set("content-type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
+}
+
+
+
 // reinitilisatiom du mot de passe par email echoue
 /**
 	func ForgotPasswordHandler(w http.ResponseWriter, r *http.Request) {
