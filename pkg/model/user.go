@@ -21,11 +21,12 @@ type User struct {
 	Email              string `gorm:"unique"`
 	Password           string `gorm:"password"`
 	EmailVerified      bool
-	Role 							 bool
+	IsAdmin 					 bool		`json:"isAdmin"`
 	VerificationToken  string `json:"verificationToken"`
 	ResetToken         string `json:"resetToken"`
 	ResetTokenExpiry   time.Time `json:"resetTokenExpiry"`
 	Vote []Vote `gorm:"foreignKey:UserId"`
+	Admin []Vote `Admin:"foreignKey:UserId"`
 }
 
 func (user *User) BeforeCreate(scope *gorm.DB) error {
@@ -72,14 +73,15 @@ func (u *User) CanLogin() bool {
 
 func GetAllUser() []User {
 	var Users []User
-	// DB.Preload("Vote").Find(&Users)
-	DB.Find(&Users)
+	DB.Preload("Vote").Find(&Users)
+	// DB.Find(&Users)
 	return Users
 }
 
 func GetUserById(Id string) (*User, *gorm.DB) {
 	var getUser User
-	db := DB.Where("userId=?", Id).Find(&getUser)
+	db := DB.Preload("Vote").Where("userId=?", Id).Find(&getUser)
+	// db := DB.Where("userId=?", Id).Find(&getUser)
 	return &getUser, db
 }
 

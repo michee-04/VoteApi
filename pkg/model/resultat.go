@@ -11,11 +11,14 @@ type Resultat struct {
 func GetResultats() []Resultat {
 
 	var resultats []Resultat
-	DB.Table("votes").Select("candidat_id, count(candidat_id) as vote_count").Group("candidat_id").Find(&resultats)
+	DB.Table("votes").
+        Select("candidatId, count(candidatId) as voteCount").
+        Group("candidatId").
+        Scan(&resultats)
 
 	for i, r := range resultats {
 		var candidat Candidat
-		DB.Where("candidat_id = ?", r.CandidatId).First(&candidat)
+		DB.Where("candidatId = ?", r.CandidatId).First(&candidat)
 		resultats[i].CandidatName = candidat.Name
 	}
 	

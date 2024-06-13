@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/michee/micgram/pkg/access"
 	"github.com/michee/micgram/pkg/controller"
 )
 
@@ -15,6 +16,7 @@ func main (){
 	r := chi.NewRouter()
 	
 	r.Use(middleware.Logger)
+	r.Use(middleware.CleanPath)
 	r.Use(middleware.RequestID)
 
 	// Authentification
@@ -44,14 +46,46 @@ func main (){
 
 	// Election
 	r.Route("/election", func(r chi.Router) {
-		r.Post("/createElection", controller.CreateElection)
+		r.With(access.AdminOnly).Post("/create", controller.CreateElection)
 		r.Get("/", controller.GetElection)
 
 		r.Route("/{electionId}", func(r chi.Router) {
 			r.Get("/", controller.GetElectionById)
-			r.Delete("/", controller.DeleteElection)
+			r.With(access.AdminOnly).Patch("/", controller.UpdateElection)
+			r.With(access.AdminOnly).Delete("/", controller.DeleteElection)
 		})
 	})
+
+
+	// Candidat 
+	r.Route("/candidat", func(r chi.Router) {
+		r.With(access.AdminOnly).Post("/create", controller.CreateCaddidat)
+
+		r.Get("/", controller.GetCandidat)
+
+		r.Route("/{userId}", func(r chi.Router) {
+			r.Get("/", controller.GetCandidat)
+			r.With(access.AdminOnly).Patch("/", controller.UpdateCandidat)
+			r.With(access.AdminOnly).Delete("/", controller.DeleteCandidat)
+		})
+	})
+
+
+	// Vote 
+	r.Route("/vote", func(r chi.Router) {
+		r.With(access.AdminOnly).Post("/create/{userId}/{electionId}/{candidatId}", controller.CreateVote)
+
+		r.Post("/", controller.GetVote)
+
+		r.Route("/{voteId}", func(r chi.Router) {
+			r.Get("/", controller.GetVoteByid)
+
+			r.With(access.AdminOnly).Delete("/", controller.DeleteVote)
+		})
+	})
+
+
+	r.Get("/resultats", controller.GetResultats)
 
 
 

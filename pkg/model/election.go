@@ -1,7 +1,6 @@
 package model
 
 import (
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
@@ -14,8 +13,8 @@ type Election struct{
 	Image string `json:"image"`
 	Name string `json:"name"`
 	Description string `json:"description"`
-	StartDate time.Time 
-	EndDate time.Time
+	StartDate string `json:"startDate"` 
+	EndDate string `json:"endDate"`
 	Candidat []Candidat `gorm:"foreignKey:ElectionId"`
 	Vote []Vote `gorm:"foreignKey:ElectionId"`
 }
@@ -30,7 +29,7 @@ func init() {
 	database.ConnectDB()
 	DB = database.GetDB()
 	DB.DropTableIfExists(&Election{})
-	DB.AutoMigrate(&User{})
+	DB.AutoMigrate(&Election{})
 }
 
 func (e *Election) CreateElection() *Election {
@@ -41,7 +40,6 @@ func (e *Election) CreateElection() *Election {
 func GetAllElection() []Election {
 	var getElection []Election
 	DB.Preload("Candidat").Preload("Vote").Find(&getElection)
-
 	return getElection
 }
 

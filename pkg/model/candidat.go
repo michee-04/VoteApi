@@ -27,7 +27,7 @@ func init() {
 	database.ConnectDB()
 	DB = database.GetDB()
 	DB.DropTableIfExists(&Candidat{})
-	DB.AutoMigrate(&User{})
+	DB.AutoMigrate(&Candidat{})
 }
 
 func (c *Candidat) CreateCandidat() *Candidat {

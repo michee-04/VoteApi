@@ -23,6 +23,7 @@ type Vote struct{
 
 func (v *Vote) BeforeCreate(scope *gorm.DB) error {
 	v.VoteId = uuid.New().String()
+	v.Date = time.Now()
 	return nil
 }
 
@@ -30,11 +31,15 @@ func (v *Vote) BeforeCreate(scope *gorm.DB) error {
 func init() {
 	database.ConnectDB()
 	DB = database.GetDB()
-	DB.DropTableIfExists(&Candidat{})
-	DB.AutoMigrate(&User{})
+	DB.DropTableIfExists(&Vote{})
+	DB.AutoMigrate(&Vote{})
 }
 
-func (v *Vote) CreateVote() *Vote {
+func (v *Vote) CreateVote(userId string, electionId string, candidatId string) *Vote {
+
+	v.UserId = userId
+	v.ElectionId = electionId
+	v.CandidatId = candidatId
 	DB.Create(v)
 	return v
 }
@@ -49,12 +54,12 @@ func GetVote() []Vote{
 
 func GetVoteById(Id string) (*Vote, *gorm.DB) {
 	var v Vote
-	db := DB.Where("voteId", Id).Find(&v)
+	db := DB.Where("voteId=?", Id).Find(&v)
 	return &v, db
 }
 
 func DeleteVote(Id string) Vote{
 	var v Vote
-	DB.Where("voteId", Id).Delete(&v)
+	DB.Where("voteId=?", Id).Delete(&v)
 	return v
 }
