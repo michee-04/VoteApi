@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -22,6 +23,7 @@ type User struct {
 	Password           string `gorm:"password"`
 	EmailVerified      bool
 	IsAdmin 					 bool		`json:"isAdmin"`
+	Token              string    `json:"token"`
 	VerificationToken  string `json:"verificationToken"`
 	ResetToken         string `json:"resetToken"`
 	ResetTokenExpiry   time.Time `json:"resetTokenExpiry"`
@@ -84,6 +86,18 @@ func GetUserById(Id string) (*User, *gorm.DB) {
 	// db := DB.Where("userId=?", Id).Find(&getUser)
 	return &getUser, db
 }
+
+func GetUserByEmail(email string) (*User, error) {
+	var user User
+	if err := DB.Where("email = ?", email).First(&user).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return nil, errors.New("user not found")
+		}
+		return nil, err
+	}
+	return &user, nil
+}
+
 
 func DeleteUserId(Id string) User {
 	var user User

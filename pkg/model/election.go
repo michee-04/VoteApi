@@ -28,7 +28,7 @@ func (election *Election) BeforeCreate(scope *gorm.DB) error {
 func init() {
 	database.ConnectDB()
 	DB = database.GetDB()
-	DB.DropTableIfExists(&Election{})
+	// DB.DropTableIfExists(&Election{})
 	DB.AutoMigrate(&Election{})
 }
 

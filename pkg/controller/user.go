@@ -2,11 +2,11 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"text/template"
 
 	"github.com/go-chi/chi"
+	"github.com/michee/micgram/pkg/access"
 	"github.com/michee/micgram/pkg/email"
 	"github.com/michee/micgram/pkg/model"
 	"github.com/michee/micgram/pkg/utils"
@@ -51,55 +51,32 @@ func VerifyHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, nil)
 }
 
+
+
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	var creds struct {
+	var loginReq struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
-	err := json.NewDecoder(r.Body).Decode(&creds)
+	err := json.NewDecoder(r.Body).Decode(&loginReq)
 	if err != nil {
-		http.Error(w, "Invalid input", http.StatusBadRequest)
+		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
 	}
 
-	if creds.Password == "" {
-		http.Error(w, "Password cannot be empty", http.StatusBadRequest)
+	user, err := model.GetUserByEmail(loginReq.Email)
+	if err != nil || !utils.CheckPasswordHash(loginReq.Password, user.Password) {
+		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
 		return
 	}
 
-	var user model.User
-	if err := model.DB.Where("email = ?", creds.Email).First(&user).Error; err != nil {
-		http.Error(w, "User not found", http.StatusUnauthorized)
+	token, err := access.GenerateJWT(user.UserId, user.IsAdmin)
+	if err != nil {
+		http.Error(w, "Error generating token", http.StatusInternalServerError)
 		return
 	}
 
-	if !user.CanLogin() {
-		http.Error(w, "Email not verified", http.StatusUnauthorized)
-		return
-	}
-
-	// Debug log pour vérifier les informations de l'utilisateur avant de vérifier le mot de passe
-	fmt.Printf("User found: %v, Password hash: %s\n", user.Email, user.Password)
-	fmt.Printf("Password provided for login: %s\n", creds.Password)
-
-	// Comparer le mot de passe fourni avec le mot de passe haché
-	if !utils.CheckPasswordHash(creds.Password, user.Password) {
-		// Ajoutez un journal pour indiquer que la vérification du mot de passe a échoué
-		fmt.Println("Password does not match")
-		http.Error(w, "Invalid password", http.StatusUnauthorized)
-		return
-	}
-
-	// Ajoutez un journal pour indiquer que la vérification du mot de passe a réussi
-	fmt.Println("Password match successful")
-
-	res, _ := json.Marshal(user)
-	w.Header().Set("content-type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(res)
-	w.Write([]byte(`{"message": "Login successful"}`))
-}
-
+	utils.RespondWithJSON(w, http.StatusOK, "Login successful", map[string]string{"token": token})}
 
 
 

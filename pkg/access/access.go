@@ -1,25 +1,20 @@
 package access
 
-
 import (
 	"net/http"
-	"github.com/michee/micgram/pkg/model"
+	"github.com/go-chi/jwtauth/v5"
 )
 
 func AdminOnly(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Assuming you have some way to identify admin, like a role in User model
-		userId := r.Header.Get("userId")
-		user, err := model.GetUserById(userId)
-
+		_, claims, err := jwtauth.FromContext(r.Context())
 		if err != nil {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			http.Error(w, "Vous n'etes pas autoriser", http.StatusUnauthorized)
 			return
 		}
 
-
-		if !user.IsAdmin {
-			http.Error(w, "Forbidden", http.StatusForbidden)
+		if !claims["isAdmin"].(bool) {
+			http.Error(w, "You are not an administrator", http.StatusForbidden)
 			return
 		}
 		next.ServeHTTP(w, r)
