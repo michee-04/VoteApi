@@ -8,18 +8,17 @@ import (
 	"github.com/michee/micgram/pkg/database"
 )
 
-
-type Vote struct{
-	VoteId string `gorm:"primary_key;column:voteId"`
-	UserId string `json:"userId"`
+type Vote struct {
+	VoteId     string `gorm:"primary_key;column:voteId"`
+	UserId     string `json:"userId"`
 	ElectionId string `json:"electionId"`
 	CandidatId string `json:"candidatId"`
-	Date time.Time
-	User User `gorm:"foreignKey:UserId" json:"-"`
-	Election Candidat `gorm:"foreignKey:ElectionId" json:"-"`
-	Candidat Election `gorm:"foreignKey:CandidatId" json:"-"`
+	Status     bool   `json:"status"`
+	Date       time.Time
+	User       User     `gorm:"foreignKey:UserId" json:"-"`
+	Election   Election `gorm:"foreignKey:ElectionId" json:"-"`
+	Candidat   Candidat `gorm:"foreignKey:CandidatId" json:"-"`
 }
-
 
 func (v *Vote) BeforeCreate(scope *gorm.DB) error {
 	v.VoteId = uuid.New().String()
@@ -27,11 +26,10 @@ func (v *Vote) BeforeCreate(scope *gorm.DB) error {
 	return nil
 }
 
-
 func init() {
 	database.ConnectDB()
 	DB = database.GetDB()
-	DB.DropTableIfExists(&Vote{})
+	// DB.DropTableIfExists(&Vote{})
 	DB.AutoMigrate(&Vote{})
 }
 
@@ -40,17 +38,16 @@ func (v *Vote) CreateVote(userId string, electionId string, candidatId string) *
 	v.UserId = userId
 	v.ElectionId = electionId
 	v.CandidatId = candidatId
+	v.Status = true
 	DB.Create(v)
 	return v
 }
 
-
-func GetVote() []Vote{
+func GetVote() []Vote {
 	var v []Vote
 	DB.Find(&v)
 	return v
 }
-
 
 func GetVoteById(Id string) (*Vote, *gorm.DB) {
 	var v Vote
@@ -58,7 +55,7 @@ func GetVoteById(Id string) (*Vote, *gorm.DB) {
 	return &v, db
 }
 
-func DeleteVote(Id string) Vote{
+func DeleteVote(Id string) Vote {
 	var v Vote
 	DB.Where("voteId=?", Id).Delete(&v)
 	return v

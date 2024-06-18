@@ -20,7 +20,6 @@ func SendVerificationEmail(user *model.User) {
 	}
 }
 
-
 func SendResetPasswordEmail(user *model.User) {
 	m := gomail.NewMessage()
 	m.SetHeader("From", "voteprojet@gmail.com")

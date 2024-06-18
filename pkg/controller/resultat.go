@@ -7,7 +7,6 @@ import (
 	"github.com/michee/micgram/pkg/model"
 )
 
-
 func GetResultats(w http.ResponseWriter, r *http.Request) {
 	resultat := model.GetResultats()
 	res, _ := json.Marshal(resultat)

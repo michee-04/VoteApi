@@ -31,7 +31,7 @@ func GetElection(w http.ResponseWriter, r *http.Request){
 
 
 func GetElectionById(w http.ResponseWriter, r *http.Request) {
-	electionId := chi.URLParam(r, "userId")
+	electionId := chi.URLParam(r, "electionId")
 	election, _ := model.GetElectionById(electionId)
 
 	if election == nil {
@@ -53,7 +53,7 @@ func UpdateElection(w http.ResponseWriter, r *http.Request){
 
 	electionDetail, db := model.GetElectionById(electionId)
 
-	if electionUpdate.Description != ""{
+	if electionUpdate.Description != "" {
 		electionDetail.Description = electionUpdate.Description
 	}
 	if electionUpdate.Name != ""{

@@ -16,19 +16,18 @@ import (
 var DB *gorm.DB
 
 type User struct {
-	UserId             string `gorm:"primary_key;column:userId"`
-	Name               string `json:"name"`
-	Username           string `json:"username"`
-	Email              string `gorm:"unique"`
-	Password           string `gorm:"password"`
-	EmailVerified      bool
-	IsAdmin 					 bool		`json:"isAdmin"`
-	Token              string    `json:"token"`
-	VerificationToken  string `json:"verificationToken"`
-	ResetToken         string `json:"resetToken"`
-	ResetTokenExpiry   time.Time `json:"resetTokenExpiry"`
-	Vote []Vote `gorm:"foreignKey:UserId"`
-	Admin []Vote `Admin:"foreignKey:UserId"`
+	UserId            string `gorm:"primary_key;column:userId"`
+	Name              string `json:"name"`
+	Username          string `json:"username"`
+	Email             string `gorm:"unique"`
+	Password          string `gorm:"password"`
+	EmailVerified     bool
+	IsAdmin           bool      `json:"isAdmin"`
+	Token             string    `json:"token"`
+	VerificationToken string    `json:"verificationToken"`
+	ResetToken        string    `json:"resetToken"`
+	ResetTokenExpiry  time.Time `json:"resetTokenExpiry"`
+	Vote              []Vote    `gorm:"foreignKey:UserId"`
 }
 
 func (user *User) BeforeCreate(scope *gorm.DB) error {
@@ -98,7 +97,6 @@ func GetUserByEmail(email string) (*User, error) {
 	return &user, nil
 }
 
-
 func DeleteUserId(Id string) User {
 	var user User
 	DB.Where("userId=?", Id).Delete(&user)
@@ -109,7 +107,7 @@ func DeleteUserId(Id string) User {
 func (u *User) GenerateResetToken() error {
 	token := uuid.New().String()
 	u.ResetToken = token
-	u.ResetTokenExpiry = time.Now().Add(1 * time.Hour) 
+	u.ResetTokenExpiry = time.Now().Add(1 * time.Hour)
 	return DB.Save(u).Error
 }
 
@@ -130,6 +128,6 @@ func (u *User) UpdatePassword(newPassword string) error {
 	u.ResetToken = ""
 	u.ResetTokenExpiry = time.Time{}
 	fmt.Println("New hashed password:", hashedPassword)
-    
+
 	return DB.Save(u).Error
 }

@@ -9,8 +9,7 @@ import (
 	"github.com/michee/micgram/pkg/utils"
 )
 
-
-func CreateCaddidat(w http.ResponseWriter, r *http.Request){
+func CreateCaddidat(w http.ResponseWriter, r *http.Request) {
 	candidat := &model.Candidat{}
 	utils.ParseBody(r, candidat)
 	c := candidat.CreateCandidat()
@@ -28,8 +27,7 @@ func GetCandidat(w http.ResponseWriter, r *http.Request) {
 	w.Write(res)
 }
 
-
-func GetCandidatById(w http.ResponseWriter, r *http.Request){
+func GetCandidatById(w http.ResponseWriter, r *http.Request) {
 	candidatId := chi.URLParam(r, "candidatId")
 	c, _ := model.GetCandidatById(candidatId)
 
@@ -42,20 +40,19 @@ func GetCandidatById(w http.ResponseWriter, r *http.Request){
 	w.Write(res)
 }
 
-
 func UpdateCandidat(w http.ResponseWriter, r *http.Request) {
 	candidatUpdate := &model.Candidat{}
 	utils.ParseBody(r, &candidatUpdate)
 	candidatId := chi.URLParam(r, "candidatId")
 	candidatDetail, db := model.GetCandidatById(candidatId)
 
-	if candidatUpdate.Name != ""{
+	if candidatUpdate.Name != "" {
 		candidatDetail.Name = candidatUpdate.Name
 	}
-	if candidatUpdate.Email != ""{
+	if candidatUpdate.Email != "" {
 		candidatDetail.Email = candidatUpdate.Email
 	}
-	if candidatUpdate.Discour != ""{
+	if candidatUpdate.Discour != "" {
 		candidatDetail.Discour = candidatUpdate.Discour
 	}
 
@@ -66,7 +63,6 @@ func UpdateCandidat(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }
-
 
 func DeleteCandidat(w http.ResponseWriter, r *http.Request) {
 	candidatId := chi.URLParam(r, "candidatId")

@@ -6,9 +6,9 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/jwtauth/v5"
 	"github.com/michee/micgram/pkg/access"
 	"github.com/michee/micgram/pkg/controller"
-	"github.com/go-chi/jwtauth/v5"
 )
 
 const port = ":3000"
@@ -18,7 +18,7 @@ var tokenAuth *jwtauth.JWTAuth
 func main() {
 	tokenAuth = jwtauth.New("HS256", []byte("ksQD5adHXZ-5SSJCupcHwBzDi6q5kfr5hdU7Eq5tMmo"), nil)
 	r := chi.NewRouter()
-	
+
 	r.Use(middleware.Logger)
 	r.Use(middleware.CleanPath)
 	r.Use(middleware.RequestID)
@@ -59,25 +59,24 @@ func main() {
 			})
 		})
 
-
-		// Candidat 
+		// Candidat
 		r.Route("/candidat", func(r chi.Router) {
 			r.With(access.AdminOnly).Post("/create", controller.CreateCaddidat)
 			r.Get("/", controller.GetCandidat)
-			r.Route("/{userId}", func(r chi.Router) {
-				r.Get("/", controller.GetCandidat)
+
+			r.Route("/{candidatId}", func(r chi.Router) {
+				r.Get("/", controller.GetCandidatById)
 				r.With(access.AdminOnly).Patch("/", controller.UpdateCandidat)
 				r.With(access.AdminOnly).Delete("/", controller.DeleteCandidat)
 			})
 		})
 
 	})
-	
 
-	// Vote 
+	// Vote
 	r.Route("/vote", func(r chi.Router) {
 		r.Post("/create/{userId}/{electionId}/{candidatId}", controller.CreateVote)
-		r.Post("/", controller.GetVote)
+		r.Get("/", controller.GetVote)
 		r.Route("/{voteId}", func(r chi.Router) {
 			r.Get("/", controller.GetVoteByid)
 			r.With(access.AdminOnly).Delete("/", controller.DeleteVote)

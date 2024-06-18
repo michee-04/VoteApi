@@ -10,17 +10,15 @@ import (
 var jwtKey = []byte("ksQD5adHXZ-5SSJCupcHwBzDi6q5kfr5hdU7Eq5tMmo")
 
 type Claims struct {
-	UserId string `json:"userId"`
-	IsAdmin bool  `json:"isAdmin"`
+	UserId  string `json:"userId"`
+	IsAdmin bool   `json:"isAdmin"`
 	jwt.StandardClaims
 }
-
-
 
 func GenerateJWT(userId string, isAdmin bool) (string, error) {
 	expirationTime := time.Now().Add(24 * time.Hour)
 	claims := &Claims{
-		UserId: userId,
+		UserId:  userId,
 		IsAdmin: isAdmin,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
@@ -29,8 +27,6 @@ func GenerateJWT(userId string, isAdmin bool) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(jwtKey)
 }
-
-
 
 func ValidateToken(signedToken string) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(signedToken, &Claims{}, func(token *jwt.Token) (interface{}, error) {
